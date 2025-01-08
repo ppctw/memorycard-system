@@ -38,16 +38,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/memorycards", memoryCardRoutes);
 app.use("/api/borrow", borrow);
 
-// 提供 React 靜態資源
-app.use(express.static(path.join(__dirname, "build")));
-
-// 捕捉所有剩餘路由並返回 React 的 index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
-
 // 啟動伺服器
 const PORT = process.env.PORT || 3002;
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
