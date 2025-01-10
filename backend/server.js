@@ -14,6 +14,7 @@ app.use(
         "http://localhost:3000", // 本地端的前端
         "http://localhost:3002", // 本地端的後端
         "http://34.81.197.33:3000", // 允許這個來源
+        "http://34.81.197.33:3002", // 允許這個來源
         process.env.ALLOWED_ORIGIN // 從環境變數中讀取的其他允許的來源
       ];
 
