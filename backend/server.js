@@ -38,16 +38,29 @@ app.use(
     allowedHeaders: [
       "Content-Type",
       "Authorization",
+      "x-auth-token", // 添加這個
       "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Headers",
       "Access-Control-Request-Private-Network"
-    ]
+    ],
+    exposedHeaders: ["x-auth-token"] // 添加這個
   })
 );
+
 app.use(express.json()); // 用來解析 JSON 請求
+
+// 為所有路由添加錯誤處理中間件
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ msg: "服務器內部錯誤" });
+});
 
 // 連接 MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
