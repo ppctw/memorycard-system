@@ -34,7 +34,7 @@ const BorrowPage = () => {
       const response = await fetch("http://localhost:3002/api/borrow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       if (response.ok) {
@@ -60,7 +60,7 @@ const BorrowPage = () => {
       const response = await fetch(`http://localhost:3002/api/borrow/${formData._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       if (response.ok) {
@@ -86,7 +86,7 @@ const BorrowPage = () => {
 
     try {
       const response = await fetch(`http://localhost:3002/api/borrow/${id}`, {
-        method: "DELETE",
+        method: "DELETE"
       });
 
       if (response.ok) {
@@ -106,7 +106,7 @@ const BorrowPage = () => {
       const response = await fetch(`http://localhost:3002/api/borrow/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnDate }),
+        body: JSON.stringify({ returnDate })
       });
 
       if (response.ok) {
@@ -167,7 +167,7 @@ const BorrowPage = () => {
                     month: "2-digit",
                     day: "2-digit",
                     hour: "2-digit",
-                    minute: "2-digit",
+                    minute: "2-digit"
                   })}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-sm">
@@ -177,7 +177,7 @@ const BorrowPage = () => {
                         month: "2-digit",
                         day: "2-digit",
                         hour: "2-digit",
-                        minute: "2-digit",
+                        minute: "2-digit"
                       })
                     : "-"}
                 </td>

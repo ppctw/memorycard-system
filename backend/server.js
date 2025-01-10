@@ -10,25 +10,35 @@ const app = express();
 app.use(
   cors({
     origin: (origin, callback) => {
+      // 如果沒有 origin（例如來自某些內部請求或測試），則允許該請求
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // 動態允許任何域名（例如，允許來自任意的 IP 或子域名的請求）
       const allowedOrigins = [
         "http://localhost:3000", // 本地端的前端
         "http://localhost:3002", // 本地端的後端
         process.env.ALLOWED_ORIGIN // 從環境變數中讀取的其他允許的來源
       ];
 
-      // 動態允許 LocalTunnel 域名（.loca.lt）
-      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".loca.lt")) {
+      // 檢查請求的 origin 是否在允許的範圍內，這裡可以根據需要調整為更靈活的匹配方式
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".loca.lt") ||
+        /^http:\/\/\d+\.\d+\.\d+\.\d+/.test(origin)
+      ) {
         callback(null, true); // 允許該來源
       } else {
         callback(new Error("Not allowed by CORS")); // 禁止該來源
       }
     },
-    credentials: true, // 如果需要傳送 cookie 或認證信息，這個設置為 true
+    credentials: true, // 允許跨域請求攜帶憑證（例如 Cookies）
     allowedHeaders: [
       "Content-Type",
       "Authorization",
       "Access-Control-Allow-Origin",
-      "Access-Control-Request-Private-Network" // 添加對私有網絡請求的處理
+      "Access-Control-Request-Private-Network"
     ]
   })
 );

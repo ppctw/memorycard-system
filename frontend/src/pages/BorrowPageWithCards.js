@@ -12,7 +12,7 @@ const BorrowPageWithCards = () => {
     cardId: "",
     borrowerName: "",
     borrowDate: "",
-    notes: "",
+    notes: ""
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -45,7 +45,7 @@ const BorrowPageWithCards = () => {
       const response = await fetch("http://localhost:3002/api/borrow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       if (response.ok) {
@@ -55,7 +55,7 @@ const BorrowPageWithCards = () => {
           cardId: "",
           borrowerName: "",
           borrowDate: "",
-          notes: "",
+          notes: ""
         });
         setRefreshKey((prev) => prev + 1);
         alert("新增成功！");
@@ -78,7 +78,7 @@ const BorrowPageWithCards = () => {
       const response = await fetch(`http://localhost:3002/api/borrow/${formData._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       if (response.ok) {
@@ -121,7 +121,7 @@ const BorrowPageWithCards = () => {
       const response = await fetch(`http://localhost:3002/api/borrow/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnDate }),
+        body: JSON.stringify({ returnDate })
       });
 
       if (response.ok) {
@@ -153,7 +153,7 @@ const BorrowPageWithCards = () => {
 
     setCurrentFormData((prev) => ({
       ...prev,
-      cardId: serialNumber,
+      cardId: serialNumber
     }));
     setSelectedCardId(serialNumber);
     setIsFormOpen(true);
@@ -170,7 +170,7 @@ const BorrowPageWithCards = () => {
               cardId: "",
               borrowerName: "",
               borrowDate: "",
-              notes: "",
+              notes: ""
             })
           }
         />
