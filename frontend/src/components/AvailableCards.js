@@ -62,11 +62,11 @@ const AvailableCards = ({ handleBorrow, isFormOpen, refreshKey }) => {
                       ? "bg-yellow-200 text-yellow-800"
                       : "bg-green-200 text-green-800"
                   } px-2 py-1 rounded`}>
-                  {card.borrowStatus ? "已借出" : "未借出"}
+                  {card.borrowStatus ? "未借出" : "已借出"}
                 </span>
               </td>
               <td className="border border-gray-300 px-4 py-2 text-sm">
-                {!card.borrowStatus && (
+                {card.borrowStatus && (
                   <button
                     onClick={() => handleBorrowClick(card.serialNumber)}
                     className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md">
