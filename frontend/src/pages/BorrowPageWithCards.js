@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "../utils/axios";
 import BorrowForm from "../components/BorrowForm";
 import AvailableCards from "../components/AvailableCards";
 import BorrowList from "../components/BorrowList";
@@ -16,20 +17,19 @@ const BorrowPageWithCards = () => {
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [borrowCount, setBorrowCount] = useState(10); //預設顯示幾筆
+  const [borrowCount, setBorrowCount] = useState(10);
 
   useEffect(() => {
     async function fetchBorrowList() {
       try {
-        const response = await fetch("http://localhost:3002/api/borrow");
-        const data = await response.json();
-        setBorrowList(data);
+        const response = await axios.get("/borrow");
+        setBorrowList(response.data);
       } catch (error) {
         console.error("無法獲取借用清單：", error);
       }
     }
     fetchBorrowList();
-  }, []);
+  }, [refreshKey]);
 
   const handleAdd = async (formData) => {
     const isCardBorrowed = borrowList.some(
@@ -42,28 +42,19 @@ const BorrowPageWithCards = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3002/api/borrow", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+      const response = await axios.post("/borrow", formData);
+      setBorrowList((prev) => [response.data, ...prev]);
+      setCurrentFormData({
+        cardId: "",
+        borrowerName: "",
+        borrowDate: "",
+        notes: ""
       });
-
-      if (response.ok) {
-        const newRecord = await response.json();
-        setBorrowList((prev) => [newRecord, ...prev]);
-        setCurrentFormData({
-          cardId: "",
-          borrowerName: "",
-          borrowDate: "",
-          notes: ""
-        });
-        setRefreshKey((prev) => prev + 1);
-        alert("新增成功！");
-      } else {
-        alert("新增失敗，請稍後再試。");
-      }
+      setRefreshKey((prev) => prev + 1);
+      alert("新增成功！");
     } catch (error) {
       console.error("新增錯誤：", error);
+      alert("新增失敗，請稍後再試。");
     }
   };
 
@@ -75,24 +66,15 @@ const BorrowPageWithCards = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3002/api/borrow/${formData._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        const updatedRecord = await response.json();
-        setBorrowList((prev) =>
-          prev.map((item) => (item._id === updatedRecord._id ? updatedRecord : item))
-        );
-        alert("編輯成功！");
-        setModalData(null);
-      } else {
-        alert("編輯失敗，請稍後再試。");
-      }
+      const response = await axios.put(`/borrow/${formData._id}`, formData);
+      setBorrowList((prev) =>
+        prev.map((item) => (item._id === response.data._id ? response.data : item))
+      );
+      alert("編輯成功！");
+      setModalData(null);
     } catch (error) {
       console.error("編輯錯誤：", error);
+      alert("編輯失敗，請稍後再試。");
     }
   };
 
@@ -100,17 +82,13 @@ const BorrowPageWithCards = () => {
     if (!window.confirm("確定要刪除此記錄嗎？")) return;
 
     try {
-      const response = await fetch(`http://localhost:3002/api/borrow/${id}`, { method: "DELETE" });
-
-      if (response.ok) {
-        setBorrowList((prev) => prev.filter((item) => item._id !== id));
-        setRefreshKey((prev) => prev + 1);
-        alert("刪除成功！");
-      } else {
-        alert("刪除失敗，請稍後再試。");
-      }
+      await axios.delete(`/borrow/${id}`);
+      setBorrowList((prev) => prev.filter((item) => item._id !== id));
+      setRefreshKey((prev) => prev + 1);
+      alert("刪除成功！");
     } catch (error) {
       console.error("刪除錯誤：", error);
+      alert("刪除失敗，請稍後再試。");
     }
   };
 
@@ -118,26 +96,17 @@ const BorrowPageWithCards = () => {
     const returnDate = new Date().toISOString();
 
     try {
-      const response = await fetch(`http://localhost:3002/api/borrow/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnDate })
-      });
-
-      if (response.ok) {
-        const updatedRecord = await response.json();
-        setBorrowList((prev) =>
-          prev.map((item) =>
-            item._id === updatedRecord._id ? { ...item, returnDate, borrowStatus: false } : item
-          )
-        );
-        setRefreshKey((prev) => prev + 1);
-        alert("歸還成功！");
-      } else {
-        alert("歸還失敗，請稍後再試。");
-      }
+      const response = await axios.put(`/borrow/${id}`, { returnDate });
+      setBorrowList((prev) =>
+        prev.map((item) =>
+          item._id === response.data._id ? { ...item, returnDate, borrowStatus: false } : item
+        )
+      );
+      setRefreshKey((prev) => prev + 1);
+      alert("歸還成功！");
     } catch (error) {
       console.error("歸還錯誤：", error);
+      alert("歸還失敗，請稍後再試。");
     }
   };
 
@@ -188,7 +157,7 @@ const BorrowPageWithCards = () => {
           handleReturn={handleReturn}
           setModalData={setModalData}
           handleEdit={handleEdit}
-          borrowCount={borrowCount} // 添加這行
+          borrowCount={borrowCount}
           setBorrowCount={setBorrowCount}
         />
       </div>
