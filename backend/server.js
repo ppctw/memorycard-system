@@ -11,31 +11,32 @@ app.use(
   cors({
     origin: (origin, callback) => {
       const allowedOrigins = [
-        "http://localhost:3000",
-        "http://localhost:3002",
-        process.env.ALLOWED_ORIGIN // You can specify other origins in the environment variables for production
+        "http://localhost:3000", // 本地端的前端
+        "http://localhost:3002", // 本地端的後端
+        "http://34.81.197.33:3000", // 允許這個來源
+        process.env.ALLOWED_ORIGIN // 從環境變數中讀取的其他允許的來源
       ];
 
-      // Allow LocalTunnel dynamic domains (loca.lt) as well
+      // 動態允許 LocalTunnel 域名（.loca.lt）
       if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".loca.lt")) {
-        callback(null, true);
+        callback(null, true); // 允許該來源
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error("Not allowed by CORS")); // 禁止該來源
       }
     },
-    credentials: true
+    credentials: true // 如果需要傳送 cookie 或認證信息，這個設置為 true
   })
 );
 
-app.use(express.json()); // Use for parsing JSON requests
+app.use(express.json()); // 用來解析 JSON 請求
 
-// Connect to MongoDB
+// 連接 MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
-// Routes
+// 路由
 const userRoutes = require("./routes/users");
 const memoryCardRoutes = require("./routes/memoryCards");
 const borrow = require("./routes/borrow");
@@ -44,7 +45,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/memorycards", memoryCardRoutes);
 app.use("/api/borrow", borrow);
 
-// Start server
+// 啟動伺服器
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
