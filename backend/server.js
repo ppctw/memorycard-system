@@ -42,7 +42,6 @@ app.use(
     ]
   })
 );
-
 app.use(express.json()); // 用來解析 JSON 請求
 
 // 連接 MongoDB

@@ -8,7 +8,7 @@ import {
   CreditCard,
   ClipboardList,
   Settings,
-  Users,
+  Users
 } from "lucide-react";
 import logo from "../assets/image/PPC_009.png";
 
@@ -40,9 +40,9 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const handleRegistration = () => {
-    alert("目前不開放註冊！");
-  };
+  // const handleRegistration = () => {
+  //   alert("目前不開放註冊！");
+  // };
   return (
     <nav className="bg-[#1a237e] pt-4 pb-4">
       <div className="container mx-auto flex justify-start items-center">
@@ -121,7 +121,7 @@ const Navbar = () => {
                 />
                 登入
               </Link>
-              <button
+              {/* <button
                 onClick={handleRegistration}
                 className="text-white flex items-center transition-all duration-300 hover:bg-blue-900 hover:text-white rounded-lg px-3 py-2">
                 <UserPlus
@@ -129,8 +129,8 @@ const Navbar = () => {
                   size={18}
                 />
                 註冊
-              </button>
-              {/* <Link
+              </button> */}
+              <Link
                 to="/register"
                 className="text-white flex items-center transition-all duration-300 hover:bg-blue-900 hover:text-white rounded-lg px-3 py-2">
                 <UserPlus
@@ -138,7 +138,7 @@ const Navbar = () => {
                   size={18}
                 />
                 註冊
-              </Link> */}
+              </Link>
             </>
           )}
         </div>
