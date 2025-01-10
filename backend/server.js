@@ -17,10 +17,11 @@ app.use(
 
       // 動態允許任何域名（例如，允許來自任意的 IP 或子域名的請求）
       const allowedOrigins = [
-        "http://localhost:3000", // 本地端的前端
-        "http://localhost:3002", // 本地端的後端
-        process.env.ALLOWED_ORIGIN // 從環境變數中讀取的其他允許的來源
-      ];
+        "http://localhost:3000",
+        "http://localhost:3002",
+        process.env.FRONTEND_URL,
+        process.env.ALLOWED_ORIGIN
+      ].filter(Boolean); // 過濾掉 undefined 或 null
 
       // 檢查請求的 origin 是否在允許的範圍內，這裡可以根據需要調整為更靈活的匹配方式
       if (
