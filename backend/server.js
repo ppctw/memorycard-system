@@ -65,13 +65,15 @@ mongoose
   .catch((err) => console.log(err));
 
 // 路由
-const userRoutes = require("./routes/users");
+const users = require("./routes/users");
 const memoryCardRoutes = require("./routes/memoryCards");
 const borrow = require("./routes/borrow");
+const userRoute = require("./routes/userRoute");
 
-app.use("/api/users", userRoutes);
+app.use("/api/users", users);
 app.use("/api/memorycards", memoryCardRoutes);
 app.use("/api/borrow", borrow);
+app.use("/api/userRoute", userRoute);
 
 // 啟動伺服器
 const PORT = process.env.PORT || 3002;
