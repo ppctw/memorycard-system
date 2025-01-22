@@ -6,7 +6,7 @@ const EditMemoryCard = ({ card, onClose, onUpdate, memoryCards, setMemoryCards }
     cardType: card.cardType || "", // 記憶卡類型
     serialNumber: card.serialNumber || "", // 編號
     remarks: card.remarks || "", // 備註
-    borrowStatus: card.borrowStatus || false, // 借用狀態
+    borrowStatus: card.borrowStatus || false // 借用狀態
   });
 
   useEffect(() => {
@@ -15,14 +15,18 @@ const EditMemoryCard = ({ card, onClose, onUpdate, memoryCards, setMemoryCards }
       cardType: card.cardType || "",
       serialNumber: card.serialNumber || "",
       remarks: card.remarks || "",
-      borrowStatus: card.borrowStatus || false, // 當 `card` 改變時更新 `borrowStatus`
+      borrowStatus: card.borrowStatus || false // 當 `card` 改變時更新 `borrowStatus`
     });
   }, [card]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
-      setForm({ ...form, [name]: checked });
+    const { name, value, type } = e.target;
+    if (name === "borrowStatus") {
+      // 將 value 字串轉換為布林值
+      setForm({
+        ...form,
+        borrowStatus: value === "true" // 當 value 為 "true" 時設為 true，否則為 false
+      });
     } else {
       setForm({ ...form, [name]: value });
     }
@@ -121,17 +125,33 @@ const EditMemoryCard = ({ card, onClose, onUpdate, memoryCards, setMemoryCards }
               htmlFor="borrowStatus">
               借用狀態
             </label>
-            <input
-              type="checkbox"
-              id="borrowStatus"
-              name="borrowStatus"
-              checked={form.borrowStatus}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            <span>已借出</span>
-          </div>
 
+            <div className="mb-2">
+              <input
+                type="radio"
+                id="status-not-borrowed"
+                name="borrowStatus"
+                value={true}
+                checked={form.borrowStatus === true} // 借用狀態為未借出
+                onChange={handleChange}
+                className="mr-2"
+              />
+              <label htmlFor="status-not-borrowed">未借出</label>
+            </div>
+
+            <div>
+              <input
+                type="radio"
+                id="status-borrowed"
+                name="borrowStatus"
+                value={false}
+                checked={form.borrowStatus === false} // 借用狀態為已借出
+                onChange={handleChange}
+                className="mr-2"
+              />
+              <label htmlFor="status-borrowed">已借出</label>
+            </div>
+          </div>
           <div className="flex justify-end">
             <button
               type="button"

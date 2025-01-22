@@ -1,5 +1,6 @@
+// src/components/AvailableCards.jsx
 import React, { useState, useEffect } from "react";
-import axios from "../utils/axios";
+import axios from "../utils/axios"; // 引入我們設定的 Axios 實例
 
 const AvailableCards = ({ handleBorrow, isFormOpen, refreshKey }) => {
   const [availableCards, setAvailableCards] = useState([]);
@@ -16,6 +17,7 @@ const AvailableCards = ({ handleBorrow, isFormOpen, refreshKey }) => {
         }
       } catch (error) {
         console.error("無法獲取記憶卡數據：", error);
+        // 這裡的 401 錯誤會由攔截器自動處理登出
       }
     }
     fetchAvailableCards();

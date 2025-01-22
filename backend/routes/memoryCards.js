@@ -1,3 +1,4 @@
+// routes/memorycards.js
 const express = require("express");
 const router = express.Router();
 const MemoryCard = require("../models/MemoryCard");
@@ -6,17 +7,18 @@ const admin = require("../middleware/admin");
 
 // 新增 MemoryCard
 router.post("/", auth, admin, async (req, res) => {
-  const { cardType, serialNumber, remarks } = req.body;
+  const { cardType, serialNumber, remarks, borrowStatus = true } = req.body; // 確保借用狀態有被處理
 
   try {
     const newCard = new MemoryCard({
-      cardType, // 記憶卡類型
-      serialNumber, // 編號
-      remarks, // 備註
+      cardType,
+      serialNumber,
+      remarks,
+      borrowStatus // 確保借用狀態會儲存
     });
 
     const card = await newCard.save();
-    res.json(card);
+    res.json(card); // 返回儲存後的資料
   } catch (err) {
     console.error("Error in POST /memorycards:", err.message);
     res.status(500).send("伺服器錯誤");
@@ -26,8 +28,8 @@ router.post("/", auth, admin, async (req, res) => {
 // 獲取所有 MemoryCards
 router.get("/", async (req, res) => {
   try {
-    const cards = await MemoryCard.find(); // 這會返回所有記憶卡
-    res.json(cards); // 返回陣列
+    const cards = await MemoryCard.find();
+    res.json(cards);
   } catch (err) {
     console.error("Error in GET /memorycards:", err.message);
     res.status(500).send("伺服器錯誤");
@@ -53,13 +55,13 @@ router.get("/:id", auth, async (req, res) => {
 
 // 更新 MemoryCard
 router.put("/:id", auth, admin, async (req, res) => {
-  const { cardType, serialNumber, remarks, borrowStatus = true } = req.body; // 設定預設值為 true
+  const { cardType, serialNumber, remarks, borrowStatus = true } = req.body;
   const cardFields = {};
 
   if (cardType) cardFields.cardType = cardType;
   if (serialNumber) cardFields.serialNumber = serialNumber;
   if (remarks) cardFields.remarks = remarks;
-  cardFields.borrowStatus = borrowStatus; // 總是更新 borrowStatus
+  cardFields.borrowStatus = borrowStatus;
 
   try {
     let card = await MemoryCard.findById(req.params.id);

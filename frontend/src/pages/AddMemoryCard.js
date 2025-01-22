@@ -8,7 +8,7 @@ const AddMemoryCard = () => {
     cardType: "", // 記憶卡類型
     serialNumber: "", // 編號
     remarks: "", // 備註
-    borrowStatus: false, // 借用狀態
+    borrowStatus: true // 借用狀態
   });
   const [memoryCards, setMemoryCards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +19,7 @@ const AddMemoryCard = () => {
   const fetchMemoryCards = async () => {
     try {
       const res = await axios.get("/memorycards");
-      console.log("(res.data", res.data);
+
       setMemoryCards(res.data);
       setLoading(false);
     } catch (err) {
@@ -34,23 +34,35 @@ const AddMemoryCard = () => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const { name, value, type } = e.target;
+    if (name === "borrowStatus") {
+      // 將 value 字串轉換為布林值
+      setForm({
+        ...form,
+        borrowStatus: value === "true" // 當 value 為 "true" 時設為 true，否則為 false
+      });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
+  //更新記憶卡
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(form); // 輸出表單資料以檢查
     try {
       const res = await axios.post("/memorycards", form);
       alert("記憶卡新增成功");
-      // 更新記憶卡列表
+      console.log("res.data", res.data);
+
+      // 更新記憶卡列表;
       setMemoryCards([...memoryCards, res.data]);
       // 清空表單
       setForm({
         cardType: "",
         serialNumber: "",
         remarks: "",
-        borrowStatus: false, // 預設為未借出
+        borrowStatus: true // 預設為未借出
       });
     } catch (err) {
       console.error(err.response.data);
@@ -58,6 +70,7 @@ const AddMemoryCard = () => {
     }
   };
 
+  //刪除記憶卡
   const handleDelete = async (id) => {
     if (!window.confirm("確定要刪除這個記憶卡嗎？")) return;
     try {
@@ -152,15 +165,32 @@ const AddMemoryCard = () => {
                 htmlFor="borrowStatus">
                 借用狀態
               </label>
-              <input
-                type="checkbox"
-                id="borrowStatus"
-                name="borrowStatus"
-                checked={form.borrowStatus}
-                onChange={(e) => setForm({ ...form, borrowStatus: e.target.checked })}
-                className="mr-2"
-              />
-              <span>已借出</span>
+
+              <div className="mb-2">
+                <input
+                  type="radio"
+                  id="status-not-borrowed"
+                  name="borrowStatus"
+                  value={true}
+                  checked={form.borrowStatus === true} // 借用狀態為未借出
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                <label htmlFor="status-not-borrowed">未借出</label>
+              </div>
+
+              <div>
+                <input
+                  type="radio"
+                  id="status-borrowed"
+                  name="borrowStatus"
+                  value={false}
+                  checked={form.borrowStatus === false} // 借用狀態為已借出
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                <label htmlFor="status-borrowed">已借出</label>
+              </div>
             </div>
 
             <button
