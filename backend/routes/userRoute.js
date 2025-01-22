@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
-// 取得所有用戶
 router.get("/", async (req, res) => {
   try {
     const users = await User.find({});
@@ -13,13 +12,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 新增用戶
 router.post("/", async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, nickname, password, role } = req.body;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({ username, password: hashedPassword, role });
+    const newUser = new User({ username, nickname, password: hashedPassword, role });
     await newUser.save();
     res.status(201).json(newUser);
   } catch (err) {
@@ -27,11 +25,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-// 更新用戶
 router.put("/:id", async (req, res) => {
   try {
-    const { username, password, role } = req.body;
-    const updateData = { username, role };
+    const { username, nickname, password, role } = req.body;
+    const updateData = { username, nickname, role };
     if (password) {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(password, salt);
@@ -44,7 +41,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// 刪除用戶
 router.delete("/:id", async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);

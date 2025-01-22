@@ -40,7 +40,7 @@ const Login = () => {
           <label
             className="block text-gray-700 mb-2"
             htmlFor="username">
-            用戶名
+            帳號
           </label>
           <input
             type="text"
@@ -49,7 +49,7 @@ const Login = () => {
             value={form.username}
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-            placeholder="輸入用戶名"
+            placeholder="輸入帳號"
             required
           />
         </div>

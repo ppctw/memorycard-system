@@ -35,10 +35,10 @@ const UserManagement = () => {
     e.preventDefault();
     try {
       if (editingUserId) {
-        await axios.put(`userRoute/${editingUserId}`, formData);
+        await axios.put(`/userRoute/${editingUserId}`, formData);
         alert("用戶更新成功");
       } else {
-        await axios.post("userRoute", formData);
+        await axios.post("/userRoute", formData);
         alert("用戶新增成功");
       }
       setFormData({ username: "", password: "", role: "user" });
@@ -54,6 +54,7 @@ const UserManagement = () => {
     setEditingUserId(user._id);
     setFormData({
       username: user.username,
+      nickname: user.nickname, // 新增
       password: "",
       role: user.role
     });
@@ -62,7 +63,7 @@ const UserManagement = () => {
   const handleDelete = async (userId) => {
     if (!window.confirm("確定要刪除這個用戶嗎？")) return;
     try {
-      await axios.delete(`userRoute/${userId}`);
+      await axios.delete(`/api/userRoute/${userId}`);
       alert("用戶已刪除");
       fetchUsers();
     } catch (error) {
@@ -88,13 +89,29 @@ const UserManagement = () => {
               <label
                 className="block text-gray-700 mb-2"
                 htmlFor="username">
-                用戶名
+                帳號
               </label>
               <input
                 type="text"
                 id="username"
                 name="username"
                 value={formData.username}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 mb-2"
+                htmlFor="nickname">
+                暱稱
+              </label>
+              <input
+                type="text"
+                id="nickname"
+                name="nickname"
+                value={formData.nickname}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
                 required
@@ -113,7 +130,7 @@ const UserManagement = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                required={!editingUserId} // 如果是編輯模式，密碼可選
+                required={!editingUserId}
               />
             </div>
             <div className="mb-4">
@@ -150,7 +167,8 @@ const UserManagement = () => {
               <table className="min-w-full bg-white">
                 <thead>
                   <tr>
-                    <th className="py-2 px-4 border-b">用戶名</th>
+                    <th className="py-2 px-4 border-b">帳號</th>
+                    <th className="py-2 px-4 border-b">暱稱</th>
                     <th className="py-2 px-4 border-b">角色</th>
                     <th className="py-2 px-4 border-b">操作</th>
                   </tr>
@@ -159,7 +177,7 @@ const UserManagement = () => {
                   {users.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="3"
+                        colSpan="4"
                         className="text-center py-4">
                         沒有用戶資料
                       </td>
@@ -168,6 +186,7 @@ const UserManagement = () => {
                     users.map((user) => (
                       <tr key={user._id}>
                         <td className="py-2 px-4 border-b">{user.username}</td>
+                        <td className="py-2 px-4 border-b">{user.nickname}</td>
                         <td className="py-2 px-4 border-b">{user.role}</td>
                         <td className="py-2 px-4 border-b">
                           <button

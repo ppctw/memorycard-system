@@ -1,24 +1,23 @@
-// frontend/src/pages/Register.js
-
 import React, { useState } from "react";
 import axios from "../utils/axios";
 import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
-  // 定義表單狀態
-  const [form, setForm] = useState({ username: "", password: "", role: "user" });
+  const [form, setForm] = useState({
+    username: "",
+    nickname: "",
+    password: "",
+    role: "user"
+  });
   const navigate = useNavigate();
 
-  // 處理表單輸入變化
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 處理表單提交
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 發送註冊請求
       const res = await axios.post("/users/register", form);
       alert("註冊成功，請登入");
       navigate("/login");
@@ -34,11 +33,12 @@ const Register = () => {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">註冊</h2>
+
         <div className="mb-4">
           <label
             className="block text-gray-700 mb-2"
             htmlFor="username">
-            用戶名
+            帳號
           </label>
           <input
             type="text"
@@ -51,6 +51,25 @@ const Register = () => {
             required
           />
         </div>
+
+        <div className="mb-4">
+          <label
+            className="block text-gray-700 mb-2"
+            htmlFor="nickname">
+            暱稱
+          </label>
+          <input
+            type="text"
+            id="nickname"
+            name="nickname"
+            value={form.nickname}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+            placeholder="輸入暱稱"
+            required
+          />
+        </div>
+
         <div className="mb-4">
           <label
             className="block text-gray-700 mb-2"
@@ -68,6 +87,7 @@ const Register = () => {
             required
           />
         </div>
+
         <div className="mb-6">
           <label
             className="block text-gray-700 mb-2"
@@ -85,11 +105,13 @@ const Register = () => {
             <option value="admin">管理員</option>
           </select>
         </div>
+
         <button
           type="submit"
           className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition duration-200">
           註冊
         </button>
+
         <p className="mt-4 text-center text-gray-600">
           已有帳號？{" "}
           <Link

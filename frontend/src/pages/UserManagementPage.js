@@ -3,8 +3,7 @@ import UserManagement from '../components/UserManagement'; // 引入已存在的
 
 const UserManagementPage = () => {
     return (
-        <div>
-           
+        <div>           
             <UserManagement />
         </div>
     );

@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { getLocalTimeString } from "../utils/timeUtils";
+import axios from "../utils/axios";
 
 const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
   const [formData, setFormData] = useState({
     cardId: initialData.cardId || "",
     borrowerName: initialData.borrowerName || "",
     borrowDate: getLocalTimeString(),
-    notes: initialData.notes || "",
+    notes: initialData.notes || ""
   });
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("/userRoute");
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
 
   useEffect(() => {
     const formatLocalTime = (date) => {
@@ -23,7 +38,7 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
       cardId: initialData.cardId || "",
       borrowerName: initialData.borrowerName || "",
       borrowDate: dateToSet,
-      notes: initialData.notes || "",
+      notes: initialData.notes || ""
     }));
   }, [initialData.cardId, initialData.borrowerName, initialData.borrowDate, initialData.notes]);
 
@@ -37,18 +52,16 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
     if (onSubmit) {
       onSubmit(formData);
       if (!initialData._id) {
-        // 只在新增模式下重置表單
         setFormData({
           cardId: "",
           borrowerName: "",
           borrowDate: getLocalTimeString(),
-          notes: "",
+          notes: ""
         });
       }
     }
   };
 
-  // JSX 部分保持不變
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg w-full">
       <h2 className="text-2xl font-bold mb-4">
@@ -77,15 +90,32 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
             className="block text-sm font-medium text-gray-700">
             借用人姓名
           </label>
-          <input
-            type="text"
-            id="borrowerName"
-            name="borrowerName"
-            value={formData.borrowerName}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            required
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              id="borrowerName"
+              name="borrowerName"
+              value={formData.borrowerName}
+              onChange={handleChange}
+              className="mt-1 block w-2/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              disabled={users.some((user) => user.nickname === formData.borrowerName)}
+              required
+            />
+            <select
+              className="mt-1 block w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              onChange={(e) =>
+                handleChange({ target: { name: "borrowerName", value: e.target.value } })
+              }>
+              <option value="">快選使用者</option>
+              {users.map((user) => (
+                <option
+                  key={user._id}
+                  value={user.nickname}>
+                  {user.nickname}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="mb-4">
           <label
