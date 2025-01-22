@@ -1,11 +1,5 @@
 # 忽略 macOS 系統檔案
 .DS_Store
 
-# 忽略 Node.js 模組
+# 忽略 Node.js 模組backend/.env frontend/.env
 node_modules/
-
-.env
-
-frontend/.env
-
-backend/.env
