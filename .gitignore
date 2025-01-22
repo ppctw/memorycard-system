@@ -4,5 +4,4 @@
 # 忽略 Node.js 模組
 node_modules/
 
-backend/ .env
-frontend/ .env
+.env
