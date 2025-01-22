@@ -126,94 +126,79 @@ const BorrowPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-row bg-gray-100">
-      <div className="w-1/3 bg-white p-6 shadow-md">
-        <BorrowForm onSubmit={handleAdd} />
+    <div className="min-h-screen p-4 bg-gray-100">
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* 左側表單 */}
+        <div className="w-full lg:w-1/3">
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <BorrowForm onSubmit={handleAdd} />
+          </div>
+        </div>
+
+        {/* 右側表格 */}
+        <div className="w-full lg:w-2/3">
+          <div className="bg-white p-4 rounded-lg shadow-md overflow-x-auto">
+            <h2 className="text-xl lg:text-2xl font-bold mb-4">借用清單</h2>
+            <table className="w-full border-collapse border border-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border p-2 text-left">記憶卡編號</th>
+                  <th className="border p-2 text-left">借用人</th>
+                  <th className="border p-2 text-left hidden md:table-cell">借用日期</th>
+                  <th className="border p-2 text-left hidden md:table-cell">歸還日期</th>
+                  <th className="border p-2 text-left hidden lg:table-cell">備註</th>
+                  <th className="border p-2 text-left">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {borrowList.map((item) => (
+                  <tr key={item._id}>
+                    <td className="border p-2">{item.cardId}</td>
+                    <td className="border p-2">{item.borrowerName}</td>
+                    <td className="border p-2 hidden md:table-cell">
+                      {new Date(item.borrowDate).toLocaleString()}
+                    </td>
+                    <td className="border p-2 hidden md:table-cell">
+                      {item.returnDate ? new Date(item.returnDate).toLocaleString() : "-"}
+                    </td>
+                    <td className="border p-2 hidden lg:table-cell">{item.notes || "-"}</td>
+                    <td className="border p-2">
+                      <div className="flex flex-wrap gap-2">
+                        {!item.returnDate ? (
+                          <>
+                            <button
+                              onClick={() => setModalData(item)}
+                              className="bg-blue-500 text-white px-2 py-1 rounded text-sm">
+                              編輯
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item._id)}
+                              className="bg-red-500 text-white px-2 py-1 rounded text-sm">
+                              刪除
+                            </button>
+                            <button
+                              onClick={() => handleReturn(item._id)}
+                              className="bg-green-500 text-white px-2 py-1 rounded text-sm">
+                              歸還
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-gray-500">已歸還</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div className="w-2/3 bg-white p-6 shadow-md">
-        <h2 className="text-2xl font-bold mb-4">借用清單</h2>
-        <table className="min-w-full border-collapse border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
-                記憶卡編號
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
-                借用人
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
-                借用日期
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
-                歸還日期
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
-                備註
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
-                操作
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {borrowList.map((item) => (
-              <tr key={item._id}>
-                <td className="border border-gray-300 px-4 py-2 text-sm">{item.cardId}</td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">{item.borrowerName}</td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
-                  {new Date(item.borrowDate).toLocaleString("zh-TW", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                  })}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
-                  {item.returnDate
-                    ? new Date(item.returnDate).toLocaleString("zh-TW", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit"
-                      })
-                    : "-"}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">{item.notes || "-"}</td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
-                  {!item.returnDate ? (
-                    <>
-                      <button
-                        onClick={() => setModalData(item)}
-                        className="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600 mr-2">
-                        編輯
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item._id)}
-                        className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 mr-2">
-                        刪除
-                      </button>
-                      <button
-                        onClick={() => handleReturn(item._id)}
-                        className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600">
-                        歸還
-                      </button>
-                    </>
-                  ) : (
-                    <span className="text-gray-500">已歸還</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
+      {/* Modal */}
       {modalData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <BorrowForm
               initialData={modalData}
               onSubmit={handleEdit}

@@ -95,7 +95,7 @@ const AddMemoryCard = () => {
     <div className="container mx-auto p-4">
       <div className="flex flex-col md:flex-row">
         {/* 新增記憶卡表單 */}
-        <div className="md:w-1/3 md:mr-4">
+        <div className="md:w-1/3 md:mr-4 mb-6 md:mb-0">
           <form
             onSubmit={handleSubmit}
             className="bg-white p-6 rounded shadow-md">
@@ -165,31 +165,31 @@ const AddMemoryCard = () => {
                 htmlFor="borrowStatus">
                 借用狀態
               </label>
-
-              <div className="mb-2">
-                <input
-                  type="radio"
-                  id="status-not-borrowed"
-                  name="borrowStatus"
-                  value={true}
-                  checked={form.borrowStatus === true} // 借用狀態為未借出
-                  onChange={handleChange}
-                  className="mr-2"
-                />
-                <label htmlFor="status-not-borrowed">未借出</label>
-              </div>
-
-              <div>
-                <input
-                  type="radio"
-                  id="status-borrowed"
-                  name="borrowStatus"
-                  value={false}
-                  checked={form.borrowStatus === false} // 借用狀態為已借出
-                  onChange={handleChange}
-                  className="mr-2"
-                />
-                <label htmlFor="status-borrowed">已借出</label>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    id="status-not-borrowed"
+                    name="borrowStatus"
+                    value={true}
+                    checked={form.borrowStatus === true}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  未借出
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    id="status-borrowed"
+                    name="borrowStatus"
+                    value={false}
+                    checked={form.borrowStatus === false}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  已借出
+                </label>
               </div>
             </div>
 
@@ -202,16 +202,16 @@ const AddMemoryCard = () => {
         </div>
 
         {/* 記憶卡資料表格 */}
-        <div className="md:w-2/3 mt-6 md:mt-0">
+        <div className="md:w-2/3">
           <div className="bg-white p-6 rounded shadow-md">
             <h2 className="text-2xl font-bold mb-4 text-center">記憶卡列表</h2>
             {loading ? (
               <p className="text-center">載入中...</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-white">
+                <table className="min-w-full bg-white text-sm">
                   <thead>
-                    <tr>
+                    <tr className="bg-gray-100 text-left">
                       <th className="py-2 px-4 border-b">編號</th>
                       <th className="py-2 px-4 border-b">記憶卡類型</th>
                       <th className="py-2 px-4 border-b">備註</th>
@@ -235,7 +235,6 @@ const AddMemoryCard = () => {
                           <td className="py-2 px-4 border-b">{card.cardType}</td>
                           <td className="py-2 px-4 border-b">{card.remarks}</td>
                           <td className="py-2 px-4 border-b">
-                            {/* 顯示借用狀態，已借出顯示黃色背景，未借出顯示綠色背景 */}
                             <span
                               className={`${
                                 card.borrowStatus
@@ -267,15 +266,6 @@ const AddMemoryCard = () => {
           </div>
         </div>
       </div>
-
-      {/* 編輯記憶卡的彈出窗口 */}
-      {editingCard && (
-        <EditMemoryCard
-          card={editingCard}
-          onClose={() => setEditingCard(null)}
-          onUpdate={updateMemoryCard}
-        />
-      )}
     </div>
   );
 };

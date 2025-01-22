@@ -129,42 +129,54 @@ const BorrowPageWithCards = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-row bg-gray-100">
-      <div className="w-1/3 bg-white p-6 shadow-md">
-        <BorrowForm
-          initialData={currentFormData}
-          onSubmit={handleAdd}
-          onClose={() =>
-            setCurrentFormData({
-              cardId: "",
-              borrowerName: "",
-              borrowDate: "",
-              notes: ""
-            })
-          }
-        />
+    <div className="min-h-screen p-4 bg-gray-100">
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* 左側表單 */}
+        <div className="w-full lg:w-1/3">
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <BorrowForm
+              initialData={currentFormData}
+              onSubmit={handleAdd}
+              onClose={() =>
+                setCurrentFormData({
+                  cardId: "",
+                  borrowerName: "",
+                  borrowDate: "",
+                  notes: ""
+                })
+              }
+            />
+          </div>
+        </div>
+
+        {/* 右側內容 */}
+        <div className="w-full lg:w-2/3 space-y-4">
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <AvailableCards
+              handleBorrow={handleBorrow}
+              isFormOpen={isFormOpen}
+              refreshKey={refreshKey}
+            />
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <BorrowList
+              borrowList={borrowList}
+              handleDelete={handleDelete}
+              handleReturn={handleReturn}
+              setModalData={setModalData}
+              handleEdit={handleEdit}
+              borrowCount={borrowCount}
+              setBorrowCount={setBorrowCount}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="w-2/3 bg-white p-6 shadow-md">
-        <AvailableCards
-          handleBorrow={handleBorrow}
-          isFormOpen={isFormOpen}
-          refreshKey={refreshKey}
-        />
-        <BorrowList
-          borrowList={borrowList}
-          handleDelete={handleDelete}
-          handleReturn={handleReturn}
-          setModalData={setModalData}
-          handleEdit={handleEdit}
-          borrowCount={borrowCount}
-          setBorrowCount={setBorrowCount}
-        />
-      </div>
-
+      {/* Modal */}
       {modalData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <BorrowForm
               initialData={modalData}
               onSubmit={handleEdit}
