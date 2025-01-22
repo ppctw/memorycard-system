@@ -5,21 +5,19 @@ import EditMemoryCard from "../components/EditMemoryCard";
 
 const AddMemoryCard = () => {
   const [form, setForm] = useState({
-    cardType: "", // 記憶卡類型
-    serialNumber: "", // 編號
-    remarks: "", // 備註
-    borrowStatus: true // 借用狀態
+    cardType: "",
+    serialNumber: "",
+    remarks: "",
+    borrowStatus: true
   });
   const [memoryCards, setMemoryCards] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingCard, setEditingCard] = useState(null); // 管理正在編輯的記憶卡
+  const [editingCard, setEditingCard] = useState(null);
   const navigate = useNavigate();
 
-  // 獲取所有記憶卡
   const fetchMemoryCards = async () => {
     try {
       const res = await axios.get("/memorycards");
-
       setMemoryCards(res.data);
       setLoading(false);
     } catch (err) {
@@ -36,33 +34,26 @@ const AddMemoryCard = () => {
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     if (name === "borrowStatus") {
-      // 將 value 字串轉換為布林值
       setForm({
         ...form,
-        borrowStatus: value === "true" // 當 value 為 "true" 時設為 true，否則為 false
+        borrowStatus: value === "true"
       });
     } else {
       setForm({ ...form, [name]: value });
     }
   };
 
-  //更新記憶卡
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form); // 輸出表單資料以檢查
     try {
       const res = await axios.post("/memorycards", form);
       alert("記憶卡新增成功");
-      console.log("res.data", res.data);
-
-      // 更新記憶卡列表;
       setMemoryCards([...memoryCards, res.data]);
-      // 清空表單
       setForm({
         cardType: "",
         serialNumber: "",
         remarks: "",
-        borrowStatus: true // 預設為未借出
+        borrowStatus: true
       });
     } catch (err) {
       console.error(err.response.data);
@@ -70,7 +61,6 @@ const AddMemoryCard = () => {
     }
   };
 
-  //刪除記憶卡
   const handleDelete = async (id) => {
     if (!window.confirm("確定要刪除這個記憶卡嗎？")) return;
     try {
@@ -89,19 +79,18 @@ const AddMemoryCard = () => {
 
   const updateMemoryCard = (updatedCard) => {
     setMemoryCards(memoryCards.map((card) => (card._id === updatedCard._id ? updatedCard : card)));
+    setEditingCard(null);
   };
 
   return (
     <div className="container mx-auto p-4">
       <div className="flex flex-col md:flex-row">
-        {/* 新增記憶卡表單 */}
         <div className="md:w-1/3 md:mr-4 mb-6 md:mb-0">
           <form
             onSubmit={handleSubmit}
             className="bg-white p-6 rounded shadow-md">
             <h2 className="text-2xl font-bold mb-4 text-center">新增記憶卡</h2>
 
-            {/* 記憶卡類型 */}
             <div className="mb-4">
               <label
                 className="block text-gray-700 mb-2"
@@ -122,7 +111,6 @@ const AddMemoryCard = () => {
               </select>
             </div>
 
-            {/* 編號 */}
             <div className="mb-4">
               <label
                 className="block text-gray-700 mb-2"
@@ -140,7 +128,6 @@ const AddMemoryCard = () => {
               />
             </div>
 
-            {/* 備註 */}
             <div className="mb-6">
               <label
                 className="block text-gray-700 mb-2"
@@ -158,7 +145,6 @@ const AddMemoryCard = () => {
               />
             </div>
 
-            {/* 借用狀態 */}
             <div className="mb-4">
               <label
                 className="block text-gray-700 mb-2"
@@ -201,7 +187,6 @@ const AddMemoryCard = () => {
           </form>
         </div>
 
-        {/* 記憶卡資料表格 */}
         <div className="md:w-2/3">
           <div className="bg-white p-6 rounded shadow-md">
             <h2 className="text-2xl font-bold mb-4 text-center">記憶卡列表</h2>
@@ -266,6 +251,18 @@ const AddMemoryCard = () => {
           </div>
         </div>
       </div>
+
+      {editingCard && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <EditMemoryCard
+              card={editingCard}
+              onSave={updateMemoryCard} // 改成 onSave
+              onClose={() => setEditingCard(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

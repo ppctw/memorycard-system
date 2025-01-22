@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "../utils/axios";
 
-const EditMemoryCard = ({ card, onClose, onUpdate, memoryCards, setMemoryCards }) => {
+const EditMemoryCard = ({ card, onClose, onSave }) => {
   const [form, setForm] = useState({
     cardType: card.cardType || "", // 記憶卡類型
     serialNumber: card.serialNumber || "", // 編號
@@ -49,14 +49,13 @@ const EditMemoryCard = ({ card, onClose, onUpdate, memoryCards, setMemoryCards }
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log(form); // 確認 form 內容是否正確
       const res = await axios.put(`/memorycards/${card._id}`, form);
       alert("記憶卡更新成功");
-      onUpdate(res.data); // 更新記憶卡列表
-      onClose(); // 關閉編輯彈窗
+      onSave(res.data); // 使用 onSave
+      onClose();
     } catch (err) {
-      console.error(err.response.data);
-      alert(err.response.data.msg || "更新失敗");
+      console.error(err.response?.data);
+      alert(err.response?.data?.msg || "更新失敗");
     }
   };
 
