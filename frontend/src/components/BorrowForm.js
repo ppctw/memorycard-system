@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getLocalTimeString } from "../utils/timeUtils";
 import axios from "../utils/axios";
 
-const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
+const BorrowForm = ({ initialData = {}, onSubmit, onClose, user }) => {
   const [formData, setFormData] = useState({
     cardId: initialData.cardId || "",
     borrowerName: initialData.borrowerName || "",
@@ -25,23 +25,14 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
   };
 
   useEffect(() => {
-    const formatLocalTime = (date) => {
-      const offset = date.getTimezoneOffset() * 60000;
-      return new Date(date.getTime() - offset).toISOString().slice(0, 16);
-    };
-
-    const dateToSet = initialData.borrowDate
-      ? formatLocalTime(new Date(initialData.borrowDate))
-      : formatLocalTime(new Date());
-
     setFormData((prev) => ({
-      _id: initialData._id, // 保留 _id 字段
+      ...prev,
       cardId: initialData.cardId || "",
       borrowerName: initialData.borrowerName || "",
-      borrowDate: dateToSet,
+      borrowDate: getLocalTimeString(),
       notes: initialData.notes || ""
     }));
-  }, [initialData.cardId, initialData.borrowerName, initialData.borrowDate, initialData.notes]);
+  }, [initialData.cardId, initialData.borrowerName, initialData.notes]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,13 +46,15 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
       if (!initialData._id) {
         setFormData({
           cardId: "",
-          borrowerName: "",
+          borrowerName: user ? user.nickname : "",
           borrowDate: getLocalTimeString(),
           notes: ""
         });
       }
     }
   };
+
+  const isAdmin = user && (user.role === "admin" || user.role === "manager");
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg w-full">
@@ -81,8 +74,13 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
             name="cardId"
             value={formData.cardId}
             onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm ${
+              !isAdmin
+                ? "bg-gray-200 cursor-not-allowed"
+                : "focus:ring-blue-500 focus:border-blue-500"
+            }`}
             required
+            readOnly={!isAdmin} // Or change to disabled={!isAdmin}
           />
         </div>
         <div className="mb-4">
@@ -91,32 +89,20 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
             className="block text-sm font-medium text-gray-700">
             借用人姓名
           </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              id="borrowerName"
-              name="borrowerName"
-              value={formData.borrowerName}
-              onChange={handleChange}
-              className="mt-1 block w-2/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              disabled={users.some((user) => user.nickname === formData.borrowerName)}
-              required
-            />
-            <select
-              className="mt-1 block w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              onChange={(e) =>
-                handleChange({ target: { name: "borrowerName", value: e.target.value } })
-              }>
-              <option value="">快選使用者</option>
-              {users.map((user) => (
-                <option
-                  key={user._id}
-                  value={user.nickname}>
-                  {user.nickname}
-                </option>
-              ))}
-            </select>
-          </div>
+          <input
+            type="text"
+            id="borrowerName"
+            name="borrowerName"
+            value={formData.borrowerName}
+            onChange={handleChange}
+            className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm ${
+              !isAdmin
+                ? "bg-gray-200 cursor-not-allowed"
+                : "focus:ring-blue-500 focus:border-blue-500"
+            }`}
+            required
+            readOnly={!isAdmin} // Or change to disabled={!isAdmin}
+          />
         </div>
         <div className="mb-4">
           <label
@@ -130,8 +116,13 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
             name="borrowDate"
             value={formData.borrowDate}
             onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm ${
+              !isAdmin
+                ? "bg-gray-200 cursor-not-allowed"
+                : "focus:ring-blue-500 focus:border-blue-500"
+            }`}
             required
+            readOnly={!isAdmin} // Or change to disabled={!isAdmin}
           />
         </div>
         <div className="mb-4">

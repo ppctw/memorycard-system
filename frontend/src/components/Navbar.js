@@ -32,6 +32,7 @@ const NavbarMetallicBlue = () => {
           .join("")
       );
       user = JSON.parse(jsonPayload).user;
+      console.log("User資料", user);
     } catch (err) {
       console.error("Token 解碼失敗", err);
     }

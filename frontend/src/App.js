@@ -10,8 +10,8 @@ import UserManagementPage from "./pages/UserManagementPage";
 import BorrowPage from "./pages/BorrowPage"; // 引入借用頁面
 import ProtectedRoute from "./components/ProtectedRoute";
 import BorrowPageWithCards from "./pages/BorrowPageWithCards";
-import BorrowPageWithCardsQrcode from "./pages/BorrowPageWithCardsQrcode";
 import LogsPage from "./pages/LogsPage";
+
 function App() {
   return (
     <Router>
@@ -57,10 +57,6 @@ function App() {
         <Route
           path="/borrow-with-cards"
           element={<BorrowPageWithCards />}
-        />
-        <Route
-          path="/borrow-memorycard-Qrcode"
-          element={<BorrowPageWithCardsQrcode />}
         />
         <Route
           path="/logs"

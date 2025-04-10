@@ -129,14 +129,14 @@ const BorrowPage = () => {
     <div className="min-h-screen p-4 bg-gray-100">
       <div className="flex flex-col lg:flex-row gap-4">
         {/* 左側表單 */}
-        {/* <div className="w-full lg:w-1/3">
+        <div className="w-full lg:w-1/3">
           <div className="bg-white p-4 rounded-lg shadow-md">
             <BorrowForm onSubmit={handleAdd} />
           </div>
-        </div> */}
+        </div>
 
         {/* 右側表格 */}
-        <div className="w-full ">
+        <div className="w-full lg:w-2/3 ">
           <div className="bg-white p-4 rounded-lg shadow-md overflow-x-auto">
             <h2 className="text-xl lg:text-2xl font-bold mb-4">借用清單</h2>
             <table className="w-full border-collapse border border-gray-200">

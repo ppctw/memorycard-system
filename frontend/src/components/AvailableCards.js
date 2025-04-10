@@ -24,6 +24,8 @@ const AvailableCards = ({ handleBorrow, isFormOpen, refreshKey }) => {
   }, [refreshKey]);
 
   const handleBorrowClick = (serialNumber) => {
+    console.log("serialNumber", serialNumber);
+
     setSelectedCardId(serialNumber);
     handleBorrow(serialNumber);
   };
@@ -34,6 +36,9 @@ const AvailableCards = ({ handleBorrow, isFormOpen, refreshKey }) => {
       <table className="min-w-full border-collapse border border-gray-200">
         <thead>
           <tr className="bg-gray-100">
+            <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
+              操作
+            </th>
             <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
               記憶卡編號
             </th>
@@ -46,14 +51,20 @@ const AvailableCards = ({ handleBorrow, isFormOpen, refreshKey }) => {
             <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
               狀態
             </th>
-            <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">
-              操作
-            </th>
           </tr>
         </thead>
         <tbody>
           {availableCards.map((card) => (
             <tr key={card._id}>
+              <td className="border border-gray-300 px-4 py-2 text-sm">
+                {card.borrowStatus && (
+                  <button
+                    onClick={() => handleBorrowClick(card.serialNumber)}
+                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md">
+                    借用
+                  </button>
+                )}
+              </td>
               <td className="border border-gray-300 px-4 py-2 text-sm">{card.serialNumber}</td>
               <td className="border border-gray-300 px-4 py-2 text-sm">{card.cardType}</td>
               <td className="border border-gray-300 px-4 py-2 text-sm">{card.remarks || "-"}</td>
@@ -66,15 +77,6 @@ const AvailableCards = ({ handleBorrow, isFormOpen, refreshKey }) => {
                   } px-2 py-1 rounded`}>
                   {card.borrowStatus ? "未借出" : "已借出"}
                 </span>
-              </td>
-              <td className="border border-gray-300 px-4 py-2 text-sm">
-                {card.borrowStatus && (
-                  <button
-                    onClick={() => handleBorrowClick(card.serialNumber)}
-                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md">
-                    借用
-                  </button>
-                )}
               </td>
             </tr>
           ))}
