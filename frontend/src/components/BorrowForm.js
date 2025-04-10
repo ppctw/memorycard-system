@@ -35,6 +35,7 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
       : formatLocalTime(new Date());
 
     setFormData((prev) => ({
+      _id: initialData._id, // 保留 _id 字段
       cardId: initialData.cardId || "",
       borrowerName: initialData.borrowerName || "",
       borrowDate: dateToSet,

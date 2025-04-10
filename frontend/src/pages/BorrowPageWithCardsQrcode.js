@@ -17,7 +17,7 @@ const BorrowPageWithCardsQrcode = () => {
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [borrowCount, setBorrowCount] = useState(10); //預設顯示幾筆
+  const [borrowCount, setBorrowCount] = useState(10); // 預設顯示幾筆
   const [isScanning, setIsScanning] = useState(false);
 
   useEffect(() => {
@@ -160,6 +160,7 @@ const BorrowPageWithCardsQrcode = () => {
     setSelectedCardId(serialNumber);
     setIsFormOpen(true);
   };
+
   // QR 掃描邏輯
   const handleQrComplete = ({ borrowerName, cardId }) => {
     const borrowDate = new Date().toISOString();
@@ -176,16 +177,16 @@ const BorrowPageWithCardsQrcode = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-row bg-gray-100">
-      <div className="absolute top-4 right-6">
-        <button
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
-          onClick={() => setIsScanning(true)}>
-          使用 QRCode 借用
-        </button>
-      </div>
-
-      <div className="w-1/3 bg-white p-6 shadow-md">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-100">
+      {/* 左側表單區域，在手機版全寬，平板及以上則佔 1/3 */}
+      <div className="w-full md:w-1/3 bg-white p-6 shadow-md">
+        <div className="flex justify-end px-5">
+          <button
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow mb-4"
+            onClick={() => setIsScanning(true)}>
+            使用 QRCode 借用
+          </button>
+        </div>
         <BorrowForm
           initialData={currentFormData}
           onSubmit={handleAdd}
@@ -200,7 +201,8 @@ const BorrowPageWithCardsQrcode = () => {
         />
       </div>
 
-      <div className="w-2/3 bg-white p-6 shadow-md">
+      {/* 右側清單區域，在手機版全寬，平板及以上則佔 2/3 */}
+      <div className="w-full md:w-2/3 bg-white p-6 shadow-md">
         <AvailableCards
           handleBorrow={handleBorrow}
           isFormOpen={isFormOpen}
@@ -217,9 +219,10 @@ const BorrowPageWithCardsQrcode = () => {
         />
       </div>
 
+      {/* 彈出視窗區塊，手機版則使用較大寬度 */}
       {modalData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/3">
             <BorrowForm
               initialData={modalData}
               onSubmit={handleEdit}
@@ -238,4 +241,5 @@ const BorrowPageWithCardsQrcode = () => {
     </div>
   );
 };
+
 export default BorrowPageWithCardsQrcode;

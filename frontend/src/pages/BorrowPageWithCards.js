@@ -3,6 +3,7 @@ import axios from "../utils/axios";
 import BorrowForm from "../components/BorrowForm";
 import AvailableCards from "../components/AvailableCards";
 import BorrowList from "../components/BorrowList";
+import QrBorrowFlow from "../components/QrBorrowFlow";
 
 const BorrowPageWithCards = () => {
   const [borrowList, setBorrowList] = useState([]);
@@ -18,6 +19,7 @@ const BorrowPageWithCards = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [borrowCount, setBorrowCount] = useState(10);
+  const [isScanning, setIsScanning] = useState(false);
 
   useEffect(() => {
     async function fetchBorrowList() {
@@ -128,55 +130,67 @@ const BorrowPageWithCards = () => {
     setIsFormOpen(true);
   };
 
-  return (
-    <div className="min-h-screen p-4 bg-gray-100">
-      <div className="flex flex-col lg:flex-row gap-4">
-        {/* 左側表單 */}
-        <div className="w-full lg:w-1/3">
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <BorrowForm
-              initialData={currentFormData}
-              onSubmit={handleAdd}
-              onClose={() =>
-                setCurrentFormData({
-                  cardId: "",
-                  borrowerName: "",
-                  borrowDate: "",
-                  notes: ""
-                })
-              }
-            />
-          </div>
-        </div>
+  // QR 掃描邏輯
+  const handleQrComplete = ({ borrowerName, cardId }) => {
+    const borrowDate = new Date().toISOString();
 
-        {/* 右側內容 */}
-        <div className="w-full lg:w-2/3 space-y-4">
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <AvailableCards
-              handleBorrow={handleBorrow}
-              isFormOpen={isFormOpen}
-              refreshKey={refreshKey}
-            />
-          </div>
+    const formData = {
+      cardId,
+      borrowerName,
+      borrowDate,
+      notes: ""
+    };
 
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <BorrowList
-              borrowList={borrowList}
-              handleDelete={handleDelete}
-              handleReturn={handleReturn}
-              setModalData={setModalData}
-              handleEdit={handleEdit}
-              borrowCount={borrowCount}
-              setBorrowCount={setBorrowCount}
-            />
-          </div>
+    handleAdd(formData);
+    setIsScanning(false);
+  };
+return (
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-100">
+      {/* 左側表單區域，在手機版全寬，平板及以上則佔 1/3 */}
+      <div className="w-full md:w-1/3 bg-white p-6 shadow-md">
+        <div className="flex justify-end px-5">
+          <button
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow mb-4"
+            onClick={() => setIsScanning(true)}>
+            使用 QRCode 借用
+          </button>
         </div>
+        <BorrowForm
+          initialData={currentFormData}
+          onSubmit={handleAdd}
+          onClose={() =>
+            setCurrentFormData({
+              cardId: "",
+              borrowerName: "",
+              borrowDate: "",
+              notes: ""
+            })
+          }
+        />
       </div>
 
-      {/* Modal */}
+      {/* 右側清單區域，在手機版全寬，平板及以上則佔 2/3 */}
+      <div className="w-full md:w-2/3 bg-white p-6 shadow-md">
+        <AvailableCards
+          handleBorrow={handleBorrow}
+          isFormOpen={isFormOpen}
+          refreshKey={refreshKey}
+        />
+        <BorrowList
+          borrowList={borrowList}
+          handleDelete={handleDelete}
+          handleReturn={handleReturn}
+          setModalData={setModalData}
+          handleEdit={handleEdit}
+          borrowCount={borrowCount}
+          setBorrowCount={setBorrowCount}
+        />
+      </div>
+
+      {/* 彈出視窗區塊，手機版則使用較大寬度 */}
       {modalData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/3">
             <BorrowForm
               initialData={modalData}
               onSubmit={handleEdit}
@@ -184,6 +198,13 @@ const BorrowPageWithCards = () => {
             />
           </div>
         </div>
+      )}
+
+      {isScanning && (
+        <QrBorrowFlow
+          onComplete={handleQrComplete}
+          onClose={() => setIsScanning(false)}
+        />
       )}
     </div>
   );

@@ -75,14 +75,15 @@ const QrBorrowFlow = ({ onComplete, onClose }) => {
             style={{ width: 250, height: 250, margin: "0 auto" }}
           />
         )}
-
-        <button
-          className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-          onClick={() => {
-            scannerRef.current?.clear().then(onClose);
-          }}>
-          取消
-        </button>
+        <div className="flex justify-center pt-3">
+          <button
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+            onClick={() => {
+              scannerRef.current?.clear().then(onClose);
+            }}>
+            取消
+          </button>
+        </div>
       </div>
     </div>
   );

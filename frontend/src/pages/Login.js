@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "../utils/axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -26,7 +26,7 @@ const Login = () => {
     <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-b from-purple-600 to-purple-900">
       {/* Background Mountains and Stars */}
       <div className="absolute inset-0 w-full h-full">
-        <svg
+        {/* <svg
           className="w-full h-full"
           viewBox="0 0 1920 1080"
           preserveAspectRatio="xMidYMid slice">
@@ -54,7 +54,7 @@ const Login = () => {
               opacity={0.5 + Math.random() * 0.5}
             />
           ))}
-        </svg>
+        </svg> */}
       </div>
 
       {/* Login Form */}
@@ -102,14 +102,13 @@ const Login = () => {
             登入
           </button>
 
-          <p className="mt-4 text-center text-white/80 text-sm">
+          <p className="mt-4 text-center text-white">
             還沒有帳號？{" "}
-            <button
-              type="button"
-              className="text-white hover:underline"
-              onClick={() => console.log("Navigate to register")}>
+            <Link
+              to="/register"
+              className="text-blue-500 hover:underline">
               註冊
-            </button>
+            </Link>
           </p>
         </form>
       </div>

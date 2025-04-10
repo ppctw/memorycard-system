@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "../utils/axios"; // 確保 utils/axios 已正確配置
+import axios from "../utils/axios";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
     username: "",
-    password: "",
+    nickname: "",
     role: "user"
   });
   const [editingUserId, setEditingUserId] = useState(null);
@@ -35,18 +35,29 @@ const UserManagement = () => {
     e.preventDefault();
     try {
       if (editingUserId) {
-        await axios.put(`/userRoute/${editingUserId}`, formData);
+        // 更新用戶
+        const response = await axios.put(`/userRoute/${editingUserId}`, formData);
+        setUsers(
+          users.map((user) => (user._id === editingUserId ? { ...user, ...response.data } : user))
+        );
         alert("用戶更新成功");
       } else {
-        await axios.post("/userRoute", formData);
+        // 新增用戶
+        const response = await axios.post("/userRoute", formData);
+        setUsers([...users, response.data]);
         alert("用戶新增成功");
       }
-      setFormData({ username: "", password: "", role: "user" });
+
+      // 重置表單
+      setFormData({
+        username: "",
+        nickname: "",
+        role: "user"
+      });
       setEditingUserId(null);
-      fetchUsers();
     } catch (error) {
       console.error("Error saving user:", error);
-      alert("操作失敗");
+      alert(error.response?.data?.msg || "操作失敗");
     }
   };
 
@@ -54,8 +65,7 @@ const UserManagement = () => {
     setEditingUserId(user._id);
     setFormData({
       username: user.username,
-      nickname: user.nickname, // 新增
-      password: "",
+      nickname: user.nickname,
       role: user.role
     });
   };
@@ -63,13 +73,45 @@ const UserManagement = () => {
   const handleDelete = async (userId) => {
     if (!window.confirm("確定要刪除這個用戶嗎？")) return;
     try {
-      await axios.delete(`/api/userRoute/${userId}`);
+      // 注意路徑是否正確，移除 /api 前綴
+      await axios.delete(`/userRoute/${userId}`);
+      setUsers(users.filter((user) => user._id !== userId));
       alert("用戶已刪除");
-      fetchUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert("刪除失敗");
+      // 提供詳細的錯誤訊息
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        alert(`刪除失敗: ${error.response.data.msg || error.response.statusText}`);
+      } else if (error.request) {
+        console.error("Request made but no response received");
+        alert("刪除失敗: 伺服器沒有回應");
+      } else {
+        console.error("Error setting up request:", error.message);
+        alert(`刪除失敗: ${error.message}`);
+      }
     }
+  };
+
+  const handleResetPassword = async (userId) => {
+    if (!window.confirm("確定要重置此用戶的密碼嗎？密碼將重置為與用戶名相同。")) return;
+    try {
+      await axios.put(`/userRoute/${userId}/reset-password`);
+      alert("密碼已重置為用戶名");
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      alert(error.response?.data?.msg || "重置密碼失敗");
+    }
+  };
+
+  const handleCancel = () => {
+    setFormData({
+      username: "",
+      nickname: "",
+      role: "user"
+    });
+    setEditingUserId(null);
   };
 
   return (
@@ -77,7 +119,7 @@ const UserManagement = () => {
       <h1 className="text-2xl font-bold mb-4 text-center">用戶管理</h1>
 
       <div className="flex flex-col md:flex-row">
-        {/* 左側新增用戶表單 */}
+        {/* 左側表單 */}
         <div className="md:w-1/3 md:mr-4">
           <form
             onSubmit={handleSubmit}
@@ -100,6 +142,9 @@ const UserManagement = () => {
                 className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
                 required
               />
+              {!editingUserId && (
+                <p className="text-sm text-gray-500 mt-1">新用戶的密碼將設置為與帳號相同</p>
+              )}
             </div>
             <div className="mb-4">
               <label
@@ -120,22 +165,6 @@ const UserManagement = () => {
             <div className="mb-4">
               <label
                 className="block text-gray-700 mb-2"
-                htmlFor="password">
-                密碼
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                required={!editingUserId}
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                className="block text-gray-700 mb-2"
                 htmlFor="role">
                 角色
               </label>
@@ -145,66 +174,97 @@ const UserManagement = () => {
                 value={formData.role}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                <option value="user">用戶</option>
+                <option value="manager">管理員</option>
+                <option value="admin">系統管理員</option>
               </select>
             </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200">
-              {editingUserId ? "更新用戶" : "新增用戶"}
-            </button>
+            <div className="flex justify-between">
+              <button
+                type="submit"
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
+                {editingUserId ? "更新用戶" : "新增用戶"}
+              </button>
+              {editingUserId && (
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-200">
+                  取消
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
-        {/* 右側用戶列表表格 */}
+        {/* 右側用戶列表 */}
         <div className="md:w-2/3">
           {loading ? (
             <p className="text-center">載入中...</p>
           ) : (
             <div className="bg-white p-6 rounded shadow-md">
               <h2 className="text-xl font-semibold mb-4">用戶列表</h2>
-              <table className="min-w-full bg-white">
-                <thead>
-                  <tr>
-                    <th className="py-2 px-4 border-b">帳號</th>
-                    <th className="py-2 px-4 border-b">暱稱</th>
-                    <th className="py-2 px-4 border-b">角色</th>
-                    <th className="py-2 px-4 border-b">操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan="4"
-                        className="text-center py-4">
-                        沒有用戶資料
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="py-2 px-4 border-b">帳號</th>
+                      <th className="py-2 px-4 border-b">暱稱</th>
+                      <th className="py-2 px-4 border-b">角色</th>
+                      <th className="py-2 px-4 border-b">操作</th>
                     </tr>
-                  ) : (
-                    users.map((user) => (
-                      <tr key={user._id}>
-                        <td className="py-2 px-4 border-b">{user.username}</td>
-                        <td className="py-2 px-4 border-b">{user.nickname}</td>
-                        <td className="py-2 px-4 border-b">{user.role}</td>
-                        <td className="py-2 px-4 border-b">
-                          <button
-                            onClick={() => handleEdit(user)}
-                            className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600">
-                            編輯
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user._id)}
-                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
-                            刪除
-                          </button>
+                  </thead>
+                  <tbody>
+                    {users.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="4"
+                          className="text-center py-4">
+                          沒有用戶資料
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      users.map((user) => (
+                        <tr
+                          key={user._id}
+                          className={editingUserId === user._id ? "bg-blue-50" : ""}>
+                          <td className="py-2 px-4 border-b">{user.username}</td>
+                          <td className="py-2 px-4 border-b">{user.nickname}</td>
+                          <td className="py-2 px-4 border-b">
+                            <span
+                              className={`inline-block px-2 py-1 rounded ${
+                                user.role === "admin"
+                                  ? "bg-red-200 text-red-800"
+                                  : "bg-green-200 text-green-800"
+                              }`}>
+                              {user.role}
+                            </span>
+                          </td>
+                          <td className="py-2 px-4 border-b">
+                            <div className="flex flex-wrap gap-1">
+                              <button
+                                onClick={() => handleEdit(user)}
+                                className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 text-xs md:text-sm">
+                                編輯
+                              </button>
+                              <button
+                                onClick={() => handleResetPassword(user._id)}
+                                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs md:text-sm">
+                                重置密碼
+                              </button>
+                              <button
+                                onClick={() => handleDelete(user._id)}
+                                className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs md:text-sm">
+                                刪除
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

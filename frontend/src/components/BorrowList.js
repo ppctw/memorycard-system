@@ -7,7 +7,7 @@ const BorrowList = ({
   setModalData,
   handleEdit,
   borrowCount,
-  setBorrowCount,
+  setBorrowCount
 }) => {
   // 先根據借用日期排序，然後取最新的幾筆
   const sortedBorrows = [...borrowList].sort(
@@ -28,7 +28,7 @@ const BorrowList = ({
             <option value={10}>最新10筆</option>
             <option value={15}>最新15筆</option>
             <option value={20}>最新20筆</option>
-            <option value={borrowList.length}>全部筆數</option>
+            {/* <option value={borrowList.length}>全部筆數</option> */}
           </select>
         </div>
       </div>
@@ -67,7 +67,7 @@ const BorrowList = ({
                     month: "2-digit",
                     day: "2-digit",
                     hour: "2-digit",
-                    minute: "2-digit",
+                    minute: "2-digit"
                   })}
                 </td>
 
@@ -78,7 +78,7 @@ const BorrowList = ({
                         month: "2-digit",
                         day: "2-digit",
                         hour: "2-digit",
-                        minute: "2-digit",
+                        minute: "2-digit"
                       })
                     : "-"}
                 </td>

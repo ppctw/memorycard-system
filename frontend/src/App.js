@@ -11,6 +11,7 @@ import BorrowPage from "./pages/BorrowPage"; // 引入借用頁面
 import ProtectedRoute from "./components/ProtectedRoute";
 import BorrowPageWithCards from "./pages/BorrowPageWithCards";
 import BorrowPageWithCardsQrcode from "./pages/BorrowPageWithCardsQrcode";
+import LogsPage from "./pages/LogsPage";
 function App() {
   return (
     <Router>
@@ -27,7 +28,7 @@ function App() {
         <Route
           path="/add-memorycard"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={["admin", "manager"]}>
               <AddMemoryCard />
             </ProtectedRoute>
           }
@@ -35,7 +36,7 @@ function App() {
         <Route
           path="/user-management"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={["admin", "manager"]}>
               <UserManagementPage />
             </ProtectedRoute>
           }
@@ -60,6 +61,14 @@ function App() {
         <Route
           path="/borrow-memorycard-Qrcode"
           element={<BorrowPageWithCardsQrcode />}
+        />
+        <Route
+          path="/logs"
+          element={
+            <ProtectedRoute role="admin">
+              <LogsPage />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </Router>
