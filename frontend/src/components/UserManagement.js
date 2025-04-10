@@ -10,6 +10,24 @@ const UserManagement = () => {
   });
   const [editingUserId, setEditingUserId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
+  let user = null;
+
+  if (token) {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      user = JSON.parse(jsonPayload).user;
+    } catch (err) {
+      console.error("Token 解碼失敗", err);
+    }
+  }
 
   const fetchUsers = async () => {
     try {
@@ -176,7 +194,7 @@ const UserManagement = () => {
                 className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
                 <option value="user">用戶</option>
                 <option value="manager">管理員</option>
-                <option value="admin">系統管理員</option>
+                {user && user.role === "admin" && <option value="admin">系統管理員</option>}
               </select>
             </div>
             <div className="flex justify-between">
@@ -235,6 +253,8 @@ const UserManagement = () => {
                               className={`inline-block px-2 py-1 rounded ${
                                 user.role === "admin"
                                   ? "bg-red-200 text-red-800"
+                                  : user.role === "manager"
+                                  ? "bg-yellow-200 text-yellow-800"
                                   : "bg-green-200 text-green-800"
                               }`}>
                               {user.role}

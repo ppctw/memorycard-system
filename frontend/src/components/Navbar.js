@@ -78,15 +78,6 @@ const NavbarMetallicBlue = () => {
               />
               我要借用
             </Link>
-            {/* <Link
-              to="/borrow-memorycard-Qrcode"
-              className="text-[#ffffff] mr-0 md:mr-4 flex items-center transition-all duration-300 hover:bg-[rgba(70,130,180,0.1)] hover:text-[#87CEFA] border border-transparent hover:border-[rgba(70,130,180,0.3)] focus:outline-none focus:ring-2 focus:ring-[rgba(70,130,180,0.4)] rounded-lg px-3 py-2">
-              <CreditCard
-                className="mr-1"
-                size={18}
-              />
-              QRCODE
-            </Link> */}
             {token ? (
               <>
                 {user && (user.role === "admin" || user.role === "manager") && (
