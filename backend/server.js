@@ -74,6 +74,7 @@ app.use("/api/users", users);
 app.use("/api/memorycards", memoryCardRoutes);
 app.use("/api/borrow", borrow);
 app.use("/api/userRoute", userRoute);
+app.use("/api/logs", require("./routes/logRoutes")); // 新增日誌路由
 
 // 啟動伺服器
 const PORT = process.env.PORT || 3002;

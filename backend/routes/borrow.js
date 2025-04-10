@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Borrow = require("../models/BorrowRecord");
 const MemoryCard = require("../models/MemoryCard");
-
+const logService = require("../services/logService");
 // GET /api/borrow - 獲取所有借用記錄並按借用日期排序
 router.get("/", async (req, res) => {
   try {
@@ -34,7 +34,7 @@ router.post("/", async (req, res) => {
       cardId,
       borrowerName,
       borrowDate,
-      notes,
+      notes
     });
 
     await newBorrow.save();
@@ -59,23 +59,66 @@ router.put("/:id", async (req, res) => {
   const { cardId, borrowerName, borrowDate, notes, returnDate } = req.body;
 
   try {
+    // 獲取更新前的記錄
+    const oldBorrow = await Borrow.findById(id);
+    if (!oldBorrow) {
+      return res.status(404).json({ message: "記錄未找到" });
+    }
+
+    // 保存原始數據用於日誌
+    const oldData = {
+      cardId: oldBorrow.cardId,
+      borrowerName: oldBorrow.borrowerName,
+      borrowDate: oldBorrow.borrowDate,
+      notes: oldBorrow.notes,
+      returnDate: oldBorrow.returnDate
+    };
+
     const updatedBorrow = await Borrow.findByIdAndUpdate(
       id,
       { cardId, borrowerName, borrowDate, notes, returnDate },
       { new: true }
     );
 
-    if (!updatedBorrow) {
-      return res.status(404).json({ message: "記錄未找到" });
-    }
+    // 檢查是否是新歸還操作
+    const isNewReturn = returnDate && !oldBorrow.returnDate;
+    let memoryCardUpdated = false;
 
     // 如果有歸還時間，將記憶卡狀態更新為未借出（borrowStatus: true）
-    if (returnDate) {
-      await MemoryCard.findOneAndUpdate(
+    if (isNewReturn) {
+      const updatedCard = await MemoryCard.findOneAndUpdate(
         { serialNumber: updatedBorrow.cardId },
         { $set: { borrowStatus: true } },
         { new: true }
       );
+      memoryCardUpdated = true;
+    }
+
+    // 記錄更新借用記錄的操作
+    try {
+      const actionType = isNewReturn ? "return" : "update";
+      await logService.createLog(
+        req.user ? req.user.id : null,
+        borrowerName, // 使用借用者名稱
+        actionType,
+        "更新借用資料",
+        id,
+        {
+          old: oldData,
+          new: {
+            cardId: updatedBorrow.cardId,
+            borrowerName: updatedBorrow.borrowerName,
+            borrowDate: updatedBorrow.borrowDate,
+            notes: updatedBorrow.notes,
+            returnDate: updatedBorrow.returnDate
+          },
+          memoryCardUpdated: memoryCardUpdated,
+          cardStatus: memoryCardUpdated ? "已更新為未借出" : "無需更新"
+        },
+        req.ip
+      );
+    } catch (logError) {
+      console.error("記錄更新借用記錄日誌失敗:", logError);
     }
 
     res.status(200).json(updatedBorrow);
@@ -85,7 +128,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// 刪除記錄時也要考慮更新記憶卡狀態
+// 刪除 (記錄時也要考慮更新記憶卡狀態)
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -95,16 +138,47 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ message: "記錄未找到" });
     }
 
+    // 保存完整的借用信息用於日誌
+    const borrowDetails = {
+      cardId: deletedBorrow.cardId,
+      borrowerName: deletedBorrow.borrowerName,
+      borrowDate: deletedBorrow.borrowDate,
+      returnDate: deletedBorrow.returnDate,
+      notes: deletedBorrow.notes
+    };
+
     // 如果刪除的是未歸還的記錄，需要將記憶卡狀態更新為未借出
+    let memoryCardUpdated = false;
     if (!deletedBorrow.returnDate) {
-      await MemoryCard.findOneAndUpdate(
+      const updatedCard = await MemoryCard.findOneAndUpdate(
         { serialNumber: deletedBorrow.cardId },
         { $set: { borrowStatus: true } },
         { new: true }
       );
+      memoryCardUpdated = true;
     }
 
     await Borrow.findByIdAndDelete(id);
+
+    // 記錄刪除借用記錄的操作
+    try {
+      await logService.createLog(
+        req.user ? req.user.id : null,
+        deletedBorrow.borrowerName, // 使用借用者名稱而不是當前用戶
+        "delete",
+        "刪除借用紀錄",
+        id,
+        {
+          ...borrowDetails,
+          memoryCardUpdated: memoryCardUpdated,
+          cardStatus: memoryCardUpdated ? "已更新為未借出" : "無需更新"
+        },
+        req.ip
+      );
+    } catch (logError) {
+      console.error("記錄刪除借用記錄日誌失敗:", logError);
+    }
+
     res.status(200).json({ message: "刪除成功" });
   } catch (error) {
     console.error("刪除記錄時出錯：", error);
