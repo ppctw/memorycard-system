@@ -63,6 +63,32 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
     }
   };
 
+  const handleCancel = () => {
+    if (initialData._id) {
+      // 編輯模式：恢復到初始的資料
+      setFormData({
+        _id: initialData._id,
+        cardId: initialData.cardId || "",
+        borrowerName: initialData.borrowerName || "",
+        borrowDate: initialData.borrowDate || getLocalTimeString(),
+        notes: initialData.notes || ""
+      });
+    } else {
+      // 新增模式：清空表單
+      setFormData({
+        cardId: "",
+        borrowerName: "",
+        borrowDate: getLocalTimeString(),
+        notes: ""
+      });
+    }
+
+    // 如果有 onClose 傳入，就執行 onClose
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg w-full">
       <h2 className="text-2xl font-bold mb-4">
@@ -81,6 +107,7 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
             name="cardId"
             value={formData.cardId}
             onChange={handleChange}
+            placeholder={"點擊『借用』按鈕自動帶入該記憶卡編號或自行輸入"}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             required
           />
@@ -104,6 +131,7 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
             />
             <select
               className="mt-1 block w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={formData.borrowerName} // 確保選擇的使用者顯示在這裡
               onChange={(e) =>
                 handleChange({ target: { name: "borrowerName", value: e.target.value } })
               }>
@@ -148,14 +176,12 @@ const BorrowForm = ({ initialData = {}, onSubmit, onClose }) => {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
         </div>
         <div className="flex justify-end">
-          {onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 mr-2">
-              取消
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleCancel} // 點擊取消時根據模式重設表單
+            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 mr-2">
+            取消
+          </button>
           <button
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">

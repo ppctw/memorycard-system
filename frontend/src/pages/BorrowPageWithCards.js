@@ -144,7 +144,8 @@ const BorrowPageWithCards = () => {
     handleAdd(formData);
     setIsScanning(false);
   };
-return (
+
+  return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-100">
       {/* 左側表單區域，在手機版全寬，平板及以上則佔 1/3 */}
       <div className="w-full md:w-1/3 bg-white p-6 shadow-md">
