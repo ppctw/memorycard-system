@@ -102,7 +102,7 @@ const Register = () => {
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
             required>
             <option value="user">用戶</option>
-            {/* <option value="admin">管理員</option> */}
+            <option value="admin">管理員</option>
           </select>
         </div>
 

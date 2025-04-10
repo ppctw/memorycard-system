@@ -1,28 +1,20 @@
-// frontend/src/pages/Login.js
-
 import React, { useState } from "react";
 import axios from "../utils/axios";
-import { useNavigate, Link, UserPlus } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  // 定義表單狀態
   const [form, setForm] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
-  // 處理表單輸入變化
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 處理表單提交
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 發送登入請求
       const res = await axios.post("/users/login", form);
-      // 儲存 token 到本地存儲
       localStorage.setItem("token", res.data.token);
-      // 重定向到主頁
       navigate("/");
     } catch (err) {
       console.error(err.response.data);
@@ -31,59 +23,96 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">登入</h2>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 mb-2"
-            htmlFor="username">
-            帳號
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-            placeholder="輸入帳號"
-            required
+    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-b from-purple-600 to-purple-900">
+      {/* Background Mountains and Stars */}
+      <div className="absolute inset-0 w-full h-full">
+        <svg
+          className="w-full h-full"
+          viewBox="0 0 1920 1080"
+          preserveAspectRatio="xMidYMid slice">
+          <path
+            d="M0,600 L400,400 L800,550 L1200,350 L1600,500 L1920,450 L1920,1080 L0,1080 Z"
+            fill="#2B1B54"
+            opacity="0.8"
           />
-        </div>
-        <div className="mb-6">
-          <label
-            className="block text-gray-700 mb-2"
-            htmlFor="password">
-            密碼
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-            placeholder="輸入密碼"
-            required
+          <path
+            d="M0,700 L500,500 L900,650 L1400,450 L1920,600 L1920,1080 L0,1080 Z"
+            fill="#1F1444"
+            opacity="0.9"
           />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200">
-          登入
-        </button>
-        {/* <p className="mt-4 text-center text-gray-600">
-          還沒有帳號？{" "}
-          <Link
-            to="/register"
-            className="text-blue-500 hover:underline">
-            註冊
-          </Link>
-        </p> */}
-      </form>
+          <path
+            d="M0,800 L600,600 L1200,750 L1920,650 L1920,1080 L0,1080 Z"
+            fill="#130C2E"
+          />
+          {[...Array(20)].map((_, i) => (
+            <circle
+              key={i}
+              cx={Math.random() * 1920}
+              cy={Math.random() * 500}
+              r="1"
+              fill="#FFFFFF"
+              opacity={0.5 + Math.random() * 0.5}
+            />
+          ))}
+        </svg>
+      </div>
+
+      {/* Login Form */}
+      <div className="relative min-h-screen flex items-center justify-center">
+        <form
+          onSubmit={handleSubmit}
+          className="w-96 p-8 rounded-2xl backdrop-blur-md bg-white/10">
+          <h2 className="text-2xl font-bold mb-6 text-center text-white">登入</h2>
+
+          <div className="mb-4">
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40"
+              placeholder="輸入帳號"
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40"
+              placeholder="輸入密碼"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-lg bg-white text-purple-700 font-medium 
+                     relative transition-all duration-300 ease-out
+                     hover:scale-[1.02] active:scale-[0.98]
+                     after:content-[''] after:absolute after:inset-0
+                     after:rounded-lg after:border-2 after:border-white/0
+                     after:transition-all after:duration-300
+                     hover:after:inset-[-3px] hover:after:border-white/50">
+            登入
+          </button>
+
+          <p className="mt-4 text-center text-white/80 text-sm">
+            還沒有帳號？{" "}
+            <button
+              type="button"
+              className="text-white hover:underline"
+              onClick={() => console.log("Navigate to register")}>
+              註冊
+            </button>
+          </p>
+        </form>
+      </div>
     </div>
   );
 };
