@@ -10,6 +10,14 @@ router.post("/", auth, admin, async (req, res) => {
   const { cardType, serialNumber, remarks, borrowStatus = true } = req.body; // 確保借用狀態有被處理
 
   try {
+    // 檢查編號是否已存在
+    if (serialNumber && serialNumber.trim() !== "") {
+      const existingCard = await MemoryCard.findOne({ serialNumber });
+      if (existingCard) {
+        return res.status(400).json({ msg: "此記憶卡編號已存在，請使用不同的編號" });
+      }
+    }
+
     const newCard = new MemoryCard({
       cardType,
       serialNumber,
@@ -59,7 +67,19 @@ router.put("/:id", auth, admin, async (req, res) => {
   const cardFields = {};
 
   if (cardType) cardFields.cardType = cardType;
-  if (serialNumber) cardFields.serialNumber = serialNumber;
+  if (serialNumber) {
+    // 檢查是否有其他記憶卡使用相同編號
+    const existingCard = await MemoryCard.findOne({
+      serialNumber,
+      _id: { $ne: req.params.id } // 排除當前正在更新的記憶卡
+    });
+
+    if (existingCard) {
+      return res.status(400).json({ msg: "此記憶卡編號已被其他記憶卡使用，請使用不同的編號" });
+    }
+
+    cardFields.serialNumber = serialNumber;
+  }
   if (remarks) cardFields.remarks = remarks;
   cardFields.borrowStatus = borrowStatus;
 
