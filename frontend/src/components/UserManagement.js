@@ -168,7 +168,7 @@ const UserManagement = () => {
               <label
                 className="block text-gray-700 mb-2"
                 htmlFor="nickname">
-                暱稱
+                用戶名稱
               </label>
               <input
                 type="text"
@@ -227,7 +227,7 @@ const UserManagement = () => {
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="py-2 px-4 border-b">帳號</th>
-                      <th className="py-2 px-4 border-b">暱稱</th>
+                      <th className="py-2 px-4 border-b">用戶名稱</th>
                       <th className="py-2 px-4 border-b">角色</th>
                       <th className="py-2 px-4 border-b">操作</th>
                     </tr>

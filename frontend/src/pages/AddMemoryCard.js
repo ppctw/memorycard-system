@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 import EditMemoryCard from "../components/EditMemoryCard";
 import ImportExcel from "../components/ImportExcel";
 import ExcelTemplateDownload from "../components/ExcelTemplateDownload";
+import { QRCodeCanvas } from "qrcode.react";
+import { Download } from "lucide-react";
 
 const AddMemoryCard = () => {
   const [form, setForm] = useState({
@@ -17,6 +19,8 @@ const AddMemoryCard = () => {
   const [loading, setLoading] = useState(true);
   const [editingCard, setEditingCard] = useState(null);
   const [showImport, setShowImport] = useState(false);
+  const [viewQRCard, setViewQRCard] = useState(null);
+  const qrRefs = useRef({});
   const navigate = useNavigate();
 
   const fetchMemoryCards = async () => {
@@ -94,6 +98,23 @@ const AddMemoryCard = () => {
 
   const toggleImport = () => {
     setShowImport(!showImport);
+  };
+
+  // 下載QR code圖片
+  const downloadQRCode = (cardSerialNumber) => {
+    const qrRef = qrRefs.current[cardSerialNumber];
+    if (!qrRef) return;
+
+    const canvas = qrRef.querySelector("canvas");
+    if (!canvas) return;
+
+    const image = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = image;
+    link.download = `memorycard-${cardSerialNumber}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -256,6 +277,7 @@ const AddMemoryCard = () => {
                       <th className="py-2 px-4 border-b">記憶卡類型</th>
                       <th className="py-2 px-4 border-b">備註</th>
                       <th className="py-2 px-4 border-b">借用狀態</th>
+                      <th className="py-2 px-4 border-b">QR Code</th>
                       <th className="py-2 px-4 border-b">操作</th>
                     </tr>
                   </thead>
@@ -263,7 +285,7 @@ const AddMemoryCard = () => {
                     {memoryCards.length === 0 ? (
                       <tr>
                         <td
-                          colSpan="5"
+                          colSpan="6"
                           className="text-center py-4">
                           沒有記憶卡資料
                         </td>
@@ -283,6 +305,37 @@ const AddMemoryCard = () => {
                               } px-2 py-1 rounded`}>
                               {card.borrowStatus ? "未借出" : "已借出"}
                             </span>
+                          </td>
+                          <td className="py-2 px-4 border-b">
+                            {/* 隱藏的QR Code (用於下載) */}
+                            <div
+                              ref={(el) => (qrRefs.current[card.serialNumber] = el)}
+                              className="hidden">
+                              <QRCodeCanvas
+                                value={card.serialNumber}
+                                size={150}
+                                bgColor="#ffffff"
+                                fgColor="#000000"
+                                level="H"
+                                includeMargin={true}
+                              />
+                            </div>
+                            <div className="flex space-x-2">
+                              {/* 下載QR Code按鈕 */}
+                              <button
+                                onClick={() => downloadQRCode(card.serialNumber)}
+                                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                                title="下載QR Code">
+                                下載
+                              </button>
+                              {/* 顯示QR Code按鈕 */}
+                              <button
+                                onClick={() => setViewQRCard(card)}
+                                className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                                title="顯示QR Code">
+                                顯示
+                              </button>
+                            </div>
                           </td>
                           <td className="py-2 px-4 border-b">
                             <button
@@ -315,6 +368,41 @@ const AddMemoryCard = () => {
               onSave={updateMemoryCard}
               onClose={() => setEditingCard(null)}
             />
+          </div>
+        </div>
+      )}
+
+      {/* QR Code 顯示彈窗 */}
+      {viewQRCard && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm text-center">
+            <h3 className="text-xl font-bold mb-4">記憶卡 QR Code</h3>
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-1">記憶卡編號</p>
+              <p className="font-medium">{viewQRCard.serialNumber}</p>
+            </div>
+            <div className="flex justify-center mb-6">
+              <QRCodeCanvas
+                value={viewQRCard.serialNumber}
+                size={200}
+                bgColor="#ffffff"
+                fgColor="#000000"
+                level="H"
+                includeMargin={true}
+              />
+            </div>
+            <div className="flex justify-between">
+              <button
+                onClick={() => downloadQRCode(viewQRCard.serialNumber)}
+                className="flex-1 bg-blue-500 text-white py-2 px-4 rounded mr-2 hover:bg-blue-600">
+                下載
+              </button>
+              <button
+                onClick={() => setViewQRCard(null)}
+                className="flex-1 bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
+                關閉
+              </button>
+            </div>
           </div>
         </div>
       )}

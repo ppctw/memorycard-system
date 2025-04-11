@@ -138,7 +138,7 @@ const Register = () => {
               value={form.nickname}
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40"
-              placeholder="輸入暱稱"
+              placeholder="輸入用戶名稱"
               required
             />
           </div>

@@ -11,7 +11,8 @@ import {
   Users,
   Menu,
   X,
-  Database
+  Database,
+  QrCode // 新增QR Code圖標
 } from "lucide-react";
 import logo from "../assets/image/PPC_009.png";
 
@@ -80,6 +81,17 @@ const NavbarMetallicBlue = () => {
             </Link>
             {token ? (
               <>
+                {/* 新增QR Code連結 - 所有已登入用戶可見 */}
+                <Link
+                  to="/qrcode"
+                  className="text-[#ffffff] mr-0 md:mr-4 flex items-center transition-all duration-300 hover:bg-[rgba(70,130,180,0.1)] hover:text-[#87CEFA] border border-transparent hover:border-[rgba(70,130,180,0.3)] focus:outline-none focus:ring-2 focus:ring-[rgba(70,130,180,0.4)] rounded-lg px-3 py-2">
+                  <QrCode
+                    className="mr-1"
+                    size={18}
+                  />
+                  我的QR Code
+                </Link>
+
                 {user && (user.role === "admin" || user.role === "manager") && (
                   <>
                     <Link
@@ -109,7 +121,6 @@ const NavbarMetallicBlue = () => {
                       />
                       用戶管理
                     </Link>
-                    {/* 添加日誌頁面的鏈接 */}
                     {user.role === "admin" && (
                       <Link
                         to="/logs"

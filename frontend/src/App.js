@@ -11,6 +11,7 @@ import BorrowPage from "./pages/BorrowPage"; // 引入借用頁面
 import ProtectedRoute from "./components/ProtectedRoute";
 import BorrowPageWithCards from "./pages/BorrowPageWithCards";
 import LogsPage from "./pages/LogsPage";
+import QrCodeGeneratorPage from "./pages/QrCodeGeneratorPage";
 function App() {
   return (
     <Router>
@@ -52,7 +53,6 @@ function App() {
           path="/borrow-memorycard"
           element={<BorrowPage />}
         />{" "}
-        {/* 添加路由 */}
         <Route
           path="/borrow-with-cards"
           element={<BorrowPageWithCards />}
@@ -62,6 +62,14 @@ function App() {
           element={
             <ProtectedRoute role="admin">
               <LogsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/qrcode"
+          element={
+            <ProtectedRoute>
+              <QrCodeGeneratorPage />
             </ProtectedRoute>
           }
         />
