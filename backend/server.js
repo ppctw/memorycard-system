@@ -10,30 +10,44 @@ const app = express();
 app.use(
   cors({
     origin: (origin, callback) => {
-      // 如果沒有 origin（例如來自某些內部請求或測試），則允許該請求
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      // 動態允許任何域名（例如，允許來自任意的 IP 或子域名的請求）
       const allowedOrigins = [
+        process.env.ALLOWED_ORIGIN,
+        "https://memory-card-borrowing-frontend.onrender.com", // 直接添加預期的前端URL
+        // 在本地開發時使用的來源
         "http://localhost:3000",
-        "http://localhost:3002",
-        process.env.FRONTEND_URL,
-        process.env.ALLOWED_ORIGIN
-      ].filter(Boolean); // 過濾掉 undefined 或 null
+        "http://localhost:3002"
+      ].filter(Boolean);
 
-      // 檢查請求的 origin 是否在允許的範圍內，這裡可以根據需要調整為更靈活的匹配方式
-      if (
-        allowedOrigins.includes(origin) ||
-        origin.endsWith(".loca.lt") ||
-        /^http:\/\/\d+\.\d+\.\d+\.\d+/.test(origin)
-      ) {
-        callback(null, true); // 允許該來源
+      if (!origin || allowedOrigins.some((allowed) => origin.indexOf(allowed) !== -1)) {
+        callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS")); // 禁止該來源
+        callback(new Error("Not allowed by CORS"));
       }
     },
+    //   // 如果沒有 origin（例如來自某些內部請求或測試），則允許該請求
+    //   if (!origin) {
+    //     return callback(null, true);
+    //   }
+
+    //   // 動態允許任何域名（例如，允許來自任意的 IP 或子域名的請求）
+    //   const allowedOrigins = [
+    //     "http://localhost:3000",
+    //     "http://localhost:3002",
+    //     process.env.FRONTEND_URL,
+    //     process.env.ALLOWED_ORIGIN
+    //   ].filter(Boolean); // 過濾掉 undefined 或 null
+
+    //   // 檢查請求的 origin 是否在允許的範圍內，這裡可以根據需要調整為更靈活的匹配方式
+    //   if (
+    //     allowedOrigins.includes(origin) ||
+    //     origin.endsWith(".loca.lt") ||
+    //     /^http:\/\/\d+\.\d+\.\d+\.\d+/.test(origin)
+    //   ) {
+    //     callback(null, true); // 允許該來源
+    //   } else {
+    //     callback(new Error("Not allowed by CORS")); // 禁止該來源
+    //   }
+    // },
     credentials: true, // 允許跨域請求攜帶憑證（例如 Cookies）
     allowedHeaders: [
       "Content-Type",
